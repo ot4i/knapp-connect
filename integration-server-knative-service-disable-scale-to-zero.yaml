@@ -1,0 +1,161 @@
+apiVersion: serving.knative.dev/v1 # Current version of Knative
+kind: Service
+metadata:
+  name: ace-server-knative
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      containers:
+        - name: ace-toolkit-server-ibm-ace-server-prod
+          image: "dev.local/knapp-connect:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 7800
+          env:
+            - name: LICENSE
+              value: "not accepted"
+            - name: USE_QMGR
+              value: "false"
+            - name: DEV_QMGR
+              value: "false"
+            - name: ACE_SERVER_NAME
+              value: "acetoolkitserver"
+            - name: SERVICE_NAME
+              value: ace-toolkit-server-ibm-ace-server-prod
+            - name: LOG_FORMAT
+              value: "json"
+            - name: ACE_ENABLE_METRICS
+              value: "false"
+            - name: ACE_ENABLE_OPEN_TRACING
+              value: "false"
+            - name: MQSI_OVERRIDE_HOSTNAME
+              value: 159.122.205.186
+            - name: ACE_DEFAULT_APPLICATION_NAME
+              value:
+            - name: DEFAULT_CONTENT_SERVER
+              value: "true"
+            - name: WORKING_DIRECTORY
+              value: "/home/aceuser/ace-server"
+            - name: bunyan__loglevel
+              value: debug
+            - name: bunyan__logfile__filename
+              value: "/opt/ibm/app/ace-server/log/integration_server.aceserver11007.designer_flows.txt"
+            - name: DESIGNER_FLOWS_OPERATION_MODE
+              value: local
+            - name: ACE_SOFTWARE
+              value: "true"
+            - name: SINGLE_TENANT
+              value: "true"
+            - name: CONNECTOR_CREDENTIAL
+              value: "/home/aceuser/connectors/credentials"
+          volumeMounts:
+            - name: odbcini
+              mountPath: "/home/aceuser/initial-config/odbcini"
+            - name: policy
+              mountPath: "/home/aceuser/initial-config/policy"
+            - name: serverconf
+              mountPath: "/home/aceuser/initial-config/serverconf"
+            - name: setdbparms
+              mountPath: "/home/aceuser/initial-config/setdbparms"
+            - name: extensions
+              mountPath: "/home/aceuser/initial-config/extensions"
+            - name: agent
+              mountPath: "/home/aceuser/initial-config/agent"
+            - name: ssl
+              mountPath: "/home/aceuser/initial-config/ssl"
+            - name: credentials
+              mountPath: "/home/aceuser/connectors/credentials"
+          securityContext:
+            runAsUser: 1000
+          livenessProbe:
+            exec:
+              command:
+                - "/readiness/ready.sh"
+            initialDelaySeconds: 360
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 1
+          readinessProbe:
+            exec:
+              command:
+                - "/readiness/ready.sh"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 1
+      volumes:
+      - name: odbcini
+        secret:
+          secretName: my-secret
+          optional: true
+          items:
+          - key: odbcini
+            path: odbc.ini
+      - name: extensions
+        secret:
+          secretName: "my-secret"
+          optional: true
+          items:
+          - key: extensions
+            path: extensions.zip
+      - name: agent
+        secret:
+          secretName: "my-secret"
+          optional: true
+          items:
+          - key: agentc
+            path: agentc.json
+          - key: agentp
+            path: agentp.json
+          - key: agentx
+            path: agentx.json
+          - key: switch
+            path: switch.json
+      - name: policy
+        secret:
+          secretName: "my-secret"
+          optional: true
+          items:
+          - key: policy
+            path: default.policyxml
+          - key: policyDescriptor
+            path: policy.descriptor
+      - name: serverconf
+        secret:
+          secretName: "my-secret"
+          optional: true
+          items:
+          - key: serverconf
+            path: server.conf.yaml
+      - name: setdbparms
+        secret:
+          secretName: "my-secret"
+          optional: true
+          items:
+          - key: setdbparms
+            path: setdbparms.txt
+      - name: ssl
+        secret:
+          secretName: "my-secret"
+          optional: true
+          items:
+          - key: ca.crt
+            path: ca.crt.pem
+          - key: tls.key
+            path: tls.key.pem
+          - key: tls.crt
+            path: tls.crt.pem
+      - name: credentials
+        secret:
+          secretName: "my-secret"
+          optional: true
+          items:
+          - key: credentials
+            path: credentials.yaml

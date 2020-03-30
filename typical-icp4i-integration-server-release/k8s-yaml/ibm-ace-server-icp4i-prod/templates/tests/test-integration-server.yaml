@@ -1,0 +1,70 @@
+---
+# Source: ibm-ace-server-icp4i-prod/templates/tests/test-integration-server.yaml
+# © Copyright IBM Corporation 2019
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-integration-server-ibm-ace-server-icp4i-prod-test
+  labels:
+    app.kubernetes.io/name: "ibm-ace-server-icp4i-prod"
+    helm.sh/chart: "ibm-ace-server-icp4i-prod"
+    app.kubernetes.io/managed-by: "Tiller"
+    app.kubernetes.io/instance: "my-integration-server"
+    release: "my-integration-server"
+    app.kubernetes.io/component: "test"
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: beta.kubernetes.io/arch
+            operator: In
+            values:
+            - 'amd64'
+  hostNetwork: false
+  hostPID: false
+  hostIPC: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 405
+  serviceAccountName: my-integration-server-ibm-ace-server-icp4i-prod-serviceaccount
+  containers:
+  - name: "my-integration-server-test"
+    image: alpine:3.8
+    securityContext:
+      privileged: false
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 405
+      capabilities:
+        drop:
+        - ALL
+    command:
+      - "sh"
+    args:
+      - "-xc"
+      - "timeout -t 360 /bin/sh -c \"until nc -v -w1 -z my-integration-server-ibm-ace-server-icp4i-prod 7600; do sleep 1; done\""
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+  restartPolicy: Never

@@ -1,0 +1,103 @@
+---
+# Source: ibm-ace-server-icp4i-prod/templates/configurator/configurator-configmap.yaml
+###############################################################################
+#  Licensed Materials - Property of IBM
+#
+# 5737-I89
+# © Copyright IBM Corp. 2019 All Rights Reserved
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+#
+###############################################################################
+#  Script run by create secrets job
+#
+###############################################################################
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: my-integration-server-ibm-ace--623f-create--d350
+  labels:
+    app.kubernetes.io/name: "ibm-ace-server-icp4i-prod"
+    helm.sh/chart: "ibm-ace-server-icp4i-prod"
+    app.kubernetes.io/managed-by: "Tiller"
+    app.kubernetes.io/instance: "my-integration-server"
+    release: "my-integration-server"
+    app.kubernetes.io/component: "config"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": hook-succeeded, before-hook-creation
+data:
+  generateConfig.sh: |
+    #!/bin/bash -e
+
+    ######################################################
+    # Generate uuid v4 apikey
+    ######################################################
+
+    IBM_ACE_DASHBOARD_ADMIN_USER="ibm-ace-dashboard-admin "$(uuid -v4)
+    IBM_ACE_DASHBOARD_OPERATOR_USER="ibm-ace-dashboard-operator "$(uuid -v4)
+    IBM_ACE_DASHBOARD_VIEWER_USER="ibm-ace-dashboard-viewer "$(uuid -v4)
+    IBM_ACE_DASHBOARD_EDITOR_USER="ibm-ace-dashboard-editor "$(uuid -v4)
+    IBM_ACE_DASHBOARD_AUDIT_USER="ibm-ace-dashboard-audit "$(uuid -v4)
+
+    ######################################################
+    # Create the Kubernetes secret resource
+    ######################################################
+
+    echo "Creating secret my-integration-server-ibm-ace-server-icp4i-prod for release "my-integration-server""
+    # Create secret
+    /usr/local/bin/kubectl create secret generic my-integration-server-ibm-ace-server-icp4i-prod --from-literal=adminusers="${IBM_ACE_DASHBOARD_ADMIN_USER}" --from-literal=operatorusers="${IBM_ACE_DASHBOARD_OPERATOR_USER}" --from-literal=viewerusers="${IBM_ACE_DASHBOARD_VIEWER_USER}" --from-literal=editorusers="${IBM_ACE_DASHBOARD_EDITOR_USER}" --from-literal=auditusers="${IBM_ACE_DASHBOARD_AUDIT_USER}"
+    # Set secret label
+    /usr/local/bin/kubectl label secret my-integration-server-ibm-ace-server-icp4i-prod release="my-integration-server"
+
+    ######################################################
+    # Create the Routes
+    ######################################################
+
+    cat <<EOT >> ./http-route.yaml
+    apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: my-integration-server-http
+      labels:
+        app.kubernetes.io/name: "ibm-ace-server-icp4i-prod"
+        helm.sh/chart: "ibm-ace-server-icp4i-prod"
+        app.kubernetes.io/managed-by: "Tiller"
+        app.kubernetes.io/instance: "my-integration-server"
+        release: "my-integration-server"
+        app.kubernetes.io/component: "config"
+    spec:
+      port:
+        targetPort: ace-http
+      to:
+        kind: Service
+        name: my-integration-server-ibm-ace-server-icp4i-prod
+    EOT
+
+    oc apply -f http-route.yaml
+
+    cat <<EOT >> ./https-route.yaml
+    apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: my-integration-server-https
+      labels:
+        app.kubernetes.io/name: "ibm-ace-server-icp4i-prod"
+        helm.sh/chart: "ibm-ace-server-icp4i-prod"
+        app.kubernetes.io/managed-by: "Tiller"
+        app.kubernetes.io/instance: "my-integration-server"
+        release: "my-integration-server"
+        app.kubernetes.io/component: "config"
+    spec:
+      port:
+        targetPort: ace-https
+      to:
+        kind: Service
+        name: my-integration-server-ibm-ace-server-icp4i-prod
+      tls:
+        termination: passthrough
+        insecureEdgeTerminationPolicy: None
+    EOT
+
+    oc apply -f https-route.yaml
