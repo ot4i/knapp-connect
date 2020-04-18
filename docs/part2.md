@@ -1,10 +1,14 @@
-# Part 2 Steel Thread
+---
+layout: page
+title: Part 2 Steel Thread
+---
+
 
 This article is part of a series of articles explaining how to deploy IBM App Connect integrations using a knative serverless runtime. In this article I will describe some of the challenges that you will face and then I will provide step-by-step instructions how to deploy a basic integration scenario on to Knative runtime. The section on challenges will provide some context to explain why the steps are what they are.  However, if you want to jump straight to the action, feel free to dive in and follow the [steps](./#steps). You can always come back and read the justification later.
 
 ## Constraints
 
-As mentioned in [Part1](./part1.hmtl) the first challenges that you will face when deploying App Connect integrations on to Knative runtimes is that Knative imposes a couple of constraints on the architecture of the deployments.
+As mentioned in [Part1](./part1) the first challenges that you will face when deploying App Connect integrations on to Knative runtimes is that Knative imposes a couple of constraints on the architecture of the deployments.
  - pods can only expose a single port
  - pods can only contain a single container
 

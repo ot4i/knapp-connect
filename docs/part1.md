@@ -1,6 +1,7 @@
-# Deploying App Connect integration on Knative
-
-## Part 1 Introduction
+---
+layout: page
+title: Part 1 Introduction
+---
 
 This article is part of a series of articles explaining how to deploy IBM App Connect integrations using a knative serverless runtime. In this article, I introduce Knative and App Connect and explore some integration use cases that would benefit from deployment on a Knative runtime. This article is intended to be a level set and some of the information here will be obvious to people how already have a basic understanding of Knative while other information will be obvious to people who already have a basic understanding of IBM App Connect.
 
@@ -62,8 +63,8 @@ There are a couple of similarities between a standard deployment of an Integrati
  - A `route` is created that will expose the integration on the external network.
 
 There are a couple of noticeable differences, however:
- - The `route` in both cases are different types.  They each have the same high level purpose but in one case it is an Open Shift `route` (`route.openshift.io`) and the other is a Knative `route` (`route.serving.knative.dev`) and as such there are some differences in the deatil of their capabilities and configuration.  I will explain some of these differences in [Part 4](./part4.html) when I explore the benefits of Knative for high workload scenarios.
- - The resource that the developer configures to declaratively specify the Integration Server has a different format.  Normally, the helm values provide an abstraction over the `PodSpec` and the values exposed to the developer are carefully chosen by the IBM App Connect development team.  When deploying to Knatitve, the developer provides an instance of the `ksvc` resource.  This contains the full `PodSpec` but Knative places some constraints on the contents of that `PodSpec`. The abstraction provided by the helm chart means that the developer has less to think about and makes their lives easier. It would be possible to provide similar abstraction layer for deployment onto Knative but the constraints are something that we need to comply with in any case. [Part2](./part2.html) will explain these constraints and how to overcome them. I will also provide
- - Knative can manage multiple versions (`Revisions`) of the deployment which can be useful for rollback etc and multiple versions active at once with configfurable traffic splitting between them.  [Part 5](./part5.html) will explore some of these capabilities more detail.
+ - The `route` in both cases are different types.  They each have the same high level purpose but in one case it is an Open Shift `route` (`route.openshift.io`) and the other is a Knative `route` (`route.serving.knative.dev`) and as such there are some differences in the deatil of their capabilities and configuration.  I will explain some of these differences in [Part 4](./part4) when I explore the benefits of Knative for high workload scenarios.
+ - The resource that the developer configures to declaratively specify the Integration Server has a different format.  Normally, the helm values provide an abstraction over the `PodSpec` and the values exposed to the developer are carefully chosen by the IBM App Connect development team.  When deploying to Knatitve, the developer provides an instance of the `ksvc` resource.  This contains the full `PodSpec` but Knative places some constraints on the contents of that `PodSpec`. The abstraction provided by the helm chart means that the developer has less to think about and makes their lives easier. It would be possible to provide similar abstraction layer for deployment onto Knative but the constraints are something that we need to comply with in any case. [Part2](./part2) will explain these constraints and how to overcome them. I will also provide
+ - Knative can manage multiple versions (`Revisions`) of the deployment which can be useful for rollback etc and multiple versions active at once with configfurable traffic splitting between them.  [Part 5](./part5) will explore some of these capabilities more detail.
 
  To get maximum value from both IBM App Connect and Knative, developers must learn how to deploy both the core application code and the integration layer onto Knative. Later articles in this series will explain how to do that with reference to sample code and utilities to help.
