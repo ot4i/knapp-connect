@@ -25,4 +25,4 @@ WORKING_DIRECTORY=/home/aceuser/ace-server
 bunyan__logfile__filename=/home/aceuser/ace-server/log/designer.json
 npx bytenode server.jsc&
 child=$!
-wait "$child
+wait "$child"

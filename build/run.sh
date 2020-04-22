@@ -9,13 +9,6 @@ _term() {
 
 trap _term SIGTERM
 
-echo "starting"
-npm start &
-child=$!
-wait "$child"
-echo "completed"&
-
-
 ./run-designer.sh &
 designer=$!
 ./run-connectors.sh &

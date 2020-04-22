@@ -18,4 +18,4 @@ source /usr/local/bin/ace_env.sh
 env
 runaceserver&
 child=$!
-wait "$child
+wait "$child"
