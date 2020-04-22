@@ -121,7 +121,7 @@ pushd config
 popd
 ```
 
-Validate that they secret was created by running
+Validate that the secret was created by running
 ```
 get secrets my-secret
 ```
