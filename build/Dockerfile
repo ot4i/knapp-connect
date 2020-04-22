@@ -1,7 +1,7 @@
 
-ARG DESIGNER_IMAGE=cp.icr.io/cp/icp4i/ace/ibm-ace-designer-flows-prod:11.0.0.7-r2-amd64
-ARG CONNECTOR_IMAGE=cp.icr.io/cp/icp4i/ace/ibm-ace-lcp-prod:11.0.0.7-r2-amd64
-ARG ACE_IMAGE=cp.icr.io/ibm-ace-server-prod:11.0.0.7-r2-amd64
+ARG DESIGNER_IMAGE=cp.icr.io/cp/icp4i/ace/ibm-ace-designer-flows-prod:11.0.0.8-r1-amd64
+ARG CONNECTOR_IMAGE=cp.icr.io/cp/icp4i/ace/ibm-ace-lcp-prod:11.0.0.8-r1-amd64
+ARG ACE_IMAGE=cp.icr.io/ibm-ace-server-prod:11.0.0.8-r1-amd64
 FROM $CONNECTOR_IMAGE AS ibm-ace-connectors
 FROM $ACE_IMAGE AS ace
 FROM $DESIGNER_IMAGE AS ibm-ace-designer-flows
