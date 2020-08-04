@@ -1,0 +1,28 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+ name: ace-echo
+ namespace: my-project
+ labels:
+   name: ace-echo
+spec:
+ triggers: []
+ source:
+   type: dockerfile
+   dockerfile: |
+     FROM ace-server-prod:latest-amd64
+     COPY Echo.bar /home/aceuser/initial-config/bars/HTTPEcho.bar
+ strategy:
+   type: Docker
+   dockerStrategy:
+     from:
+       kind: ImageStreamTag
+       name: 'ace-server-prod:latest-amd64'
+       namespace: my-project
+     pullSecret:
+       name: cp.icr.io
+ output:
+   to:
+     kind: ImageStreamTag
+     name: 'ace-echo:latest-amd64'
+     namespace: my-project
